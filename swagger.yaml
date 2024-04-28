@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: Express App with Swagger
+  description: |-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    
+  contact:
+    name: Mahdi Azad
+    email: mahdiazad1998@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:800/api
+    description: dev
+tags:
+  - name: Auth
+    description: Authentication Endpoints
+  - name: User
+    description: User Endpoints
+  - name: Profile
+    description: Profile Endpoints
+paths:
+  /auth/verify-user:
+    get: 
+      tags: ["Auth"]
+      summary: Verify the user by token
+      description: Verify the user by token
+      parameters:
+        - in: header
+          name: authy-token
+          schema: 
+            type: string
+          required: true
+          description: Bearer token for auth
+      responses:
+        '200':
+          description: User verified successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "662d7f8bb91f73755b244991"
+                    description: Unique identifier for the user.
+                  name:
+                    type: string
+                    example: "Mahdi"
+                    description: Name of the user.
+                  email:
+                    type: string
+                    example: "mahdi@email.com"
+                    description: Email of the user.
+                  __v:
+                    type: integer
+                    example: 0
+                    description: Version of the user.
+        "500":
+          $ref: "#/components/responses/500"
+  /auth/login:
+    post: 
+      tags: ["Auth"]
+      summary: Performing login of user
+      description: Performing the login using email and password
+      requestBody: 
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: mahdiazad1998@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+              required: [email, password]
+      responses: 
+        "200":
+          description: Signin Successful
+          content: 
+            "application/json":
+              schema: 
+                type: object
+                properties: 
+                  code: 
+                    type: integer
+                    format: int32
+                    example: 200
+                  message:
+                    type: string
+                    example: Signin Successful
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjYyZDdmOGJiOTFmNzM3NTViMjQ0OTkxIn0sImlhdCI6MTcxNDI2NzYwNywiZXhwIjoxNzE0MjcxMjA3fQ.QDNtJ7zl017ymqBuKi2ojPE7Z-z55yjO5fDGbFScIss"
+        "500":
+          $ref: "#/components/responses/500"
+        "400":
+          description: Bad Request
+          content:
+            "application/json":
+              schema: 
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message: 
+                    type: string
+                    example: "Invalid Credentials"
+  /profile/create:
+    post: 
+      security:
+        - bearerAuth: []
+      
+      tags: ["Profile"]
+      summary: Create Profile For User
+      description: Create Profile For User
+      requestBody: 
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                bio:
+                  type: string
+                  example: "Give Bio"
+                company:
+                  type: string
+                  example: Company Name
+                website:
+                  type: string
+                  example: https://www.website.com
+                location:
+                  type: string
+                  example: USA
+              required: [bio]
+      responses: 
+        "201":
+          description: Profile Created Successfully
+          content: 
+            "application/json":
+              schema: 
+                type: object
+                properties: 
+                  code: 
+                    type: integer
+                    format: int32
+                    example: 201
+                  message:
+                    type: string
+                    example: Profile Created Succesfully
+                  profile: 
+                    type: object
+                    properties:
+                      user:
+                        type: string
+                        example: "662d7f8bb91f73755b244991"
+                      bio:
+                        type: string
+                        example: "Profile Bio"
+                      company:  
+                        type: string
+                        example: TS4U
+                      createdAt: 
+                        type: string
+                        example: 2024-04-27T22:46:50.613Z
+                      updatedAt: 
+                        type: string
+                        example: 2024-04-27T22:46:50.613Z
+        "500":
+          $ref: "#/components/responses/500"
+  /profile/get-profile:
+    get: 
+      tags: ["Profile"]
+      summary: Get All the Profiles
+      description: Retrieve All Profiles that exist
+
+      responses: 
+        '200':
+          description: Profiles retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profiles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: "example_profile_id"
+                          description: Unique identifier for the profile.
+                        user:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: "example_user_id"
+                              description: Unique identifier for the user.
+                            name:
+                              type: string
+                              example: "Mahdi"
+                              description: Name of the user.
+                            email:
+                              type: string
+                              example: "mahdi@email.com"
+                              description: Email of the user.
+                          description: Information about the user.
+                        bio:
+                          type: string
+                          example: "This is an example bio."
+                          description: Biography of the user.
+                        company:
+                          type: string
+                          example: "Example Company"
+                          description: Company the user is associated with.
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2024-04-27T22:46:50.613Z"
+                          description: Date and time when the profile was created.
+                        updatedAt:
+                          type: string
+                          format: date-time
+                          example: "2024-04-27T22:50:44.093Z"
+                          description: Date and time when the profile was last updated.
+                        __v:
+                          type: integer
+                          example: 0
+                          description: Version of the profile.
+        "500":
+          $ref: "#/components/responses/500"
+  /user/register:
+    post: 
+      tags: ["User"]
+      summary: Registering a New User
+      description: Registering a New User
+      requestBody: 
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Mahdi"
+                email:
+                  type: string
+                  example: mahdi@email.com
+                password:
+                  type: string
+                  example: mahdi123
+              required: [name, password, email]
+      responses:
+        "200":
+          description: User Registered Successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjYyZGJmN2YxMzFmMmU1ZDM1YjQ3MDU5In0sImlhdCI6MTcxNDI3NDE3NSwiZXhwIjoxNzE0Mjc3Nzc1fQ.PYD-ZS9LIVnSrNMSmiN_0L4SNlzTfjCRv_TKQdsQIPA
+                    description: Authentication token for the newly registered user.
+        "500":
+          $ref: "#/components/responses/500"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  responses:
+    "500":
+          description: Server Error
+          content:
+            "application/json":
+              schema: 
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  message: 
+                    type: string
+                    example: "Server Errors"
+  
